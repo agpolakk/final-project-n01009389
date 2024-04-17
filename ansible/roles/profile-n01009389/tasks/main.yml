@@ -1,0 +1,7 @@
+---
+- name: Append lines to /etc/profile
+  ansible.builtin.lineinfile:
+    path: /etc/profile
+    line: |
+      # Test block added by Ansible for user {{ ansible_user }}
+      export TMOUT=1500

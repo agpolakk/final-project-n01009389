@@ -1,0 +1,27 @@
+---
+- name: Add group cloudadmins
+  ansible.builtin.group:
+    name: cloudadmins
+
+- name: Add users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: cloudadmins,wheel
+    generate_ssh_key: yes
+    ssh_key_bits: 2048
+    ssh_key_file: ~/.ssh/id_rsa
+    password: ""
+  loop:
+    - { name: 'user100' }
+    - { name: 'user200' }
+    - { name: 'user300' }
+
+- name: Distribute SSH keys
+  ansible.builtin.copy:
+    src: ~/.ssh/id_rsa.pub
+    dest: "/home/{{ item.name }}/.ssh/authorized_keys"
+    owner: "{{ item.name }}"
+  loop:
+    - { name: 'user100' }
+    - { name: 'user200' }
+    - { name: 'user300' }

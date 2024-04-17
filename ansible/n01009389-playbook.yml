@@ -1,0 +1,9 @@
+- name: Apply roles to all Linux inventory nodes
+  hosts: all
+  become: yes
+  gather_facts: yes
+  roles:
+    - datadisk-n01009389
+    - profile-n01009389
+    - user-n01009389
+    - webserver-n01009389

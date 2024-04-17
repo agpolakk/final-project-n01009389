@@ -1,0 +1,10 @@
+---
+- name: Execute Ansible Roles on Linux Nodes
+  hosts: all
+  become: true
+  gather_facts: yes
+  roles:
+    - datadisk-n01009389
+    - profile-n01009389
+    - user-n01009389
+    - webserver-n01009389

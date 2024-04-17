@@ -1,0 +1,76 @@
+---
+- name: Partition 10GB Data Disks
+  parted:
+    device: "{{ item }}"
+    state: present
+    part_start: 0%
+    part_end: 40%
+    name: part1
+    fs_type: xfs
+  loop: "{{ data_disk_devices }}"
+
+- name: Mount Partition 1
+  mount:
+    path: /part1
+    src: "{{ item }}"
+    fstype: xfs
+    state: mounted
+  loop: "{{ data_disk_devices }}"
+---
+- name: Append Lines to /etc/profile
+  lineinfile:
+    path: /etc/profile
+    line: "{{ item }}"
+  loop:
+    - "# Test block added by Ansible for {{ ansible_user }}"
+    - "export TMOUT=1500"
+---
+- name: Add group cloudadmins
+  group:
+    name: cloudadmins
+
+- name: Add users and assign to groups
+  user:
+    name: "{{ item.name }}"
+    groups: "{{ item.groups }}"
+    generate_ssh_key: yes
+    ssh_key_file: /home/{{ item.name }}/.ssh/id_rsa
+  loop:
+    - { name: user100, groups: "cloudadmins,wheel" }
+    - { name: user200, groups: "cloudadmins,wheel" }
+    - { name: user300, groups: "cloudadmins,wheel" }
+
+- name: Distribute SSH keys for users
+  authorized_key:
+    user: "{{ item }}"
+    key: "{{ lookup('file', '/home/{{ item }}/.ssh/id_rsa.pub') }}"
+  loop:
+    - user100
+    - user200
+    - user300
+---
+- name: Install Apache web server
+  yum:
+    name: httpd
+    state: present
+
+- name: Copy HTML files to web server
+  copy:
+    src: "{{ item }}"
+    dest: /var/www/html/index.html
+  loop:
+    - files/vm1.html
+    - files/vm2.html
+    - files/vm3.html
+
+- name: Set file permissions
+  file:
+    path: /var/www/html/index.html
+    mode: "0444"
+
+- name: Start Apache service
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+---
