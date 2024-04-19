@@ -1,6 +1,6 @@
 ---
 - name: Execute Ansible Roles on Linux Nodes
-  hosts: all
+  hosts: "{{target_hosts}}"
   become: true
   gather_facts: yes
   roles:
