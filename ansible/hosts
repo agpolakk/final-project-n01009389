@@ -1,7 +1,7 @@
 [linux]
-n01009389-c-vm1
-n01009389-c-vm2
-
+n01009389-u-vm1 ansible_host=n01009389-u-vm1.canadacentral.cloudapp.azure.com
+n01009389-u-vm2 ansible_host=n01009389-u-vm2.canadacentral.cloudapp.azure.com
+n01009389-u-vm3 ansible_host=n01009389-u-vm3.canadacentral.cloudapp.azure.com
 
 [os:children]
 linux
