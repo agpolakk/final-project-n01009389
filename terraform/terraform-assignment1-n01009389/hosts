@@ -1,18 +1,11 @@
 [linux]
-n01009389-c-vm1
-n01009389-c-vm2
-
-[windows]
-n01009389-w-vm1
+n01009389-u-vm1 ansible_host=n01009389-u-vm1.canadacentral.cloudapp.azure.com
+n01009389-u-vm2 ansible_host=n01009389-u-vm2.canadacentral.cloudapp.azure.com
+n01009389-u-vm3 ansible_host=n01009389-u-vm3.canadacentral.cloudapp.azure.com
 
 [os:children]
 linux
-windows
 
-[windows:vars]
-ansible_user=winadm
-ansible_password="Winadm!23"
-ansible_connection=winrm
-ansible_port=5985
-ansible_winrm_transport=ntlm
-ansible_winrm_server_cert_validation=ignore
+[linux:vars]
+ansible_user=n01009389
+ansible_ssh_private_key_file=~/.ssh/id_rsa
