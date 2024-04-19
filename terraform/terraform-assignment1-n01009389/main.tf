@@ -93,11 +93,7 @@ module "datadisk" {
 
   resource_group_name  = module.rgroup.rgroup_name.name
   location            = module.rgroup.rgroup_name.location
-  vm_names = [
-    "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Compute/virtualMachines/n01009389-u-vm1",
-    "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Compute/virtualMachines/n01009389-u-vm2",
-    "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Compute/virtualMachines/n01009389-u-vm3"
-  ]
+  vm_names = ["n01009389-u-vm1", "n01009389-u-vm2", "n01009389-u-vm3"]
 
   disk_size_gb        = 10
 }
