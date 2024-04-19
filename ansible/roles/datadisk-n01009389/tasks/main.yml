@@ -1,6 +1,6 @@
 ---
 - name: Partition data disks
-  ansible.builtin.parted:
+  parted:
     device: "/dev/sdb"   
     number: 1
     state: present
@@ -9,13 +9,13 @@
   register: part1_result
 
 - name: Format partition with XFS
-  ansible.builtin.mkfs:
+  filesystem:
     fstype: xfs
     dev: "/dev/sdb1"   
   when: part1_result.changed
 
 - name: Mount partition persistently
-  ansible.builtin.mount:
+  mount:
     path: /part1
     src: "/dev/sdb1"   
     fstype: xfs
@@ -24,7 +24,7 @@
   when: part1_result.changed
 
 - name: Partition data disks
-  ansible.builtin.parted:
+  parted:
     device: "/dev/sdb"   
     number: 2
     state: present
@@ -33,13 +33,13 @@
   register: part2_result
 
 - name: Format partition with EXT4
-  ansible.builtin.mkfs:
+  filesystem:
     fstype: ext4
     dev: "/dev/sdb2"   
   when: part2_result.changed
 
 - name: Mount partition persistently
-  ansible.builtin.mount:
+  mount:
     path: /part2
     src: "/dev/sdb2"   
     fstype: ext4

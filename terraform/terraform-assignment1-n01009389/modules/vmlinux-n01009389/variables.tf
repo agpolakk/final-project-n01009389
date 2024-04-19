@@ -1,6 +1,6 @@
 variable "vm_instances" {
   description = "Map of VM instances with unique identifiers."
-  type        = list(any)
+  type        = map(any)
 }
 
 variable "size" {
@@ -31,11 +31,6 @@ variable "los_disk_attr" {
   description = "Storage account type for the OS disk."
   type        = map(string)
 }
-
-# variable "boot_diagnostics_storage_account_uri" {
-#   description = "Storage account URI for boot diagnostics."
-#   type        = string
-# }
 
 variable "subnet_id" {
   description = "ID of the subnet to attach the network interface."

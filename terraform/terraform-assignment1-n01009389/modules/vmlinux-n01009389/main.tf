@@ -1,19 +1,20 @@
 resource "azurerm_linux_virtual_machine" "vm" {
-  # for_each                = var.vm_instances
-  count = length(var.vm_instances)
-  # name                    = each.key
-  name                    = var.vm_instances[count.index]
-  # computer_name       = each.key
-  computer_name           = var.vm_instances[count.index]
+   for_each                = var.vm_instances
+  #count = length(var.vm_instances)
+   name                    = each.key
+  #name                    = var.vm_instances[count.index]
+   computer_name       = each.key
+  #computer_name           = var.vm_instances[count.index]
   resource_group_name     = var.resource_group_name
   location                = var.location
-  # size                    = each.value
   size                    = var.size
   # count                   = var.nb_count
   admin_username          = var.admin_username
   disable_password_authentication = true
-  # network_interface_ids   = [azurerm_network_interface.nic[each.key].id]
-  network_interface_ids   = [azurerm_network_interface.nic[count.index].id]
+  network_interface_ids   = [
+    azurerm_network_interface.nic[each.key].id
+  ]
+  #network_interface_ids   = [azurerm_network_interface.nic[count.index].id]
   availability_set_id     = azurerm_availability_set.linux_availability_set.id
   tags                = local.common_tags
 
@@ -23,7 +24,7 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 
   os_disk {
-    name                 = "${var.vm_instances[count.index]}-os-disk"
+    name                 = "${each.key}-os-disk"
     caching              = var.los_disk_attr["los_disk_caching"]
     storage_account_type = var.los_disk_attr["los_storage_account_type"]
     disk_size_gb         = var.los_disk_attr["los_disk_size"]
@@ -43,48 +44,48 @@ resource "azurerm_linux_virtual_machine" "vm" {
 }
 
 resource "azurerm_virtual_machine_extension" "networkWatcher" {
-  # for_each           = azurerm_linux_virtual_machine.vm
-  count = length(var.vm_instances)
-  virtual_machine_id = azurerm_linux_virtual_machine.vm[count.index].id
-  name                 = "networkWatcher"
+  for_each           = var.vm_instances
+  #count = length(var.vm_instances)
+  virtual_machine_id =   azurerm_linux_virtual_machine.vm[each.key].id
+  name                 = "${each.key}-networkWatcher"
   publisher            = "Microsoft.Azure.NetworkWatcher"
   type                 = "NetworkWatcherAgentLinux"
-  type_handler_version = "1.0.0"
+  type_handler_version = "1.4"
   }
 
   resource "azurerm_virtual_machine_extension" "azureMonitor" {
-    # for_each           = azurerm_linux_virtual_machine.vm
+    for_each           = var.vm_instances
     # virtual_machine_id = each.value.id
-    count = length(var.vm_instances)
-  virtual_machine_id = azurerm_linux_virtual_machine.vm[count.index].id
-    name                 = "azureMonitor"
+    #count = length(var.vm_instances)
+    virtual_machine_id =   azurerm_linux_virtual_machine.vm[each.key].id
+    name                 = "${each.key}-azureMonitor"
     publisher            = "Microsoft.Azure.Monitor"
     type                 = "AzureMonitorLinuxAgent"
-    type_handler_version = "1.0.0"
+    type_handler_version = "1.9"
   }
 
 resource "azurerm_public_ip" "vm_public_ip" {
-  count = length(var.vm_instances)
-  # for_each                = var.vm_instances
-  name                    = "${var.vm_instances[count.index]}-publicip"
+  #count = length(var.vm_instances)
+  for_each                = var.vm_instances
+  name                    = "${each.key}-publicip"
   location                = var.location
   resource_group_name     = var.resource_group_name
   allocation_method       = "Dynamic"
 }
 
 resource "azurerm_network_interface" "nic" {
-  # for_each                = var.vm_instances
-  count = length(var.vm_instances)
-  name                    = "${var.vm_instances[count.index]}-nic"
+  for_each                = var.vm_instances
+  #count = length(var.vm_instances)
+  name                    = "${each.key}-nic"
   location                = var.location
   resource_group_name     = var.resource_group_name
   
   ip_configuration {
     
-    name                          = "${var.vm_instances[count.index]}-ipconfig"
+    name                          = "${each.key}-ipconfig"
     subnet_id                     = var.subnet_id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = "${azurerm_public_ip.vm_public_ip[count.index].id}"
+    public_ip_address_id          = azurerm_public_ip.vm_public_ip[each.key].id
   }
 
   tags = {
@@ -100,6 +101,6 @@ resource "azurerm_availability_set" "linux_availability_set" {
   location                     = var.location
   resource_group_name          = var.resource_group_name
   platform_fault_domain_count  = 3
-  platform_update_domain_count = 3
+  platform_update_domain_count = 2
 }
 

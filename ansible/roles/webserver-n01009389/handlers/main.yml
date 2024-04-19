@@ -1,5 +1,5 @@
 handlers:
   - name: Restart Apache
-    ansible.builtin.service:
+    systemd:
       name: apache2
       state: restarted

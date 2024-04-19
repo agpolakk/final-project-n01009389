@@ -17,7 +17,7 @@ output "common_info" {
   value = {
     log_analytics_name            = module.common.log_analytics_name
     recovery_services_vault_name  = module.common.recovery_services_vault_name
-    storage_account_name          = module.common.storage_account_name
+    storage_account_name          = module.common.storage_account.name
   }
 }
 

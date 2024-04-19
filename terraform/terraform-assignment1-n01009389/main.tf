@@ -34,7 +34,11 @@ module "vmlinux" {
 
   resource_group_name     = module.rgroup.rgroup_name.name
   location                = module.rgroup.rgroup_name.location
-  vm_instances            = ["n01009389-u-vm1", "n01009389-u-vm2", "n01009389-u-vm3"]
+  vm_instances            = {
+    n01009389-u-vm1 = "",
+    n01009389-u-vm2 = "",
+    n01009389-u-vm3 = ""
+  }
   size                  = "Standard_B1s"
   admin_username        = "Albin"
   public_key            = "~/.ssh/id_rsa.pub"
@@ -51,7 +55,7 @@ module "vmlinux" {
   linux_availability_set = "linux_avs"
   # nb_count               = 2
   subnet_id                = module.network.subnet_id
-  boot_diagnostics_storage_account_uri  = "https://tfstaten01663926sa.blob.core.windows.net/tfstatefiles/tfstate"
+  boot_diagnostics_storage_account_uri  = module.common.storage_account.primary_blob_endpoint
 
 }
 # https://tfstaten01009389sa.blob.core.windows.net/tfstatefiles/terraform.tfstate.assignment
@@ -97,26 +101,22 @@ module "datadisk" {
 
   disk_size_gb        = 10
 }
+*/
 
 module "loadbalancer" {
   source = "./modules/loadbalancer-n01009389"
 
   resource_group_name     = module.rgroup.rgroup_name.name
   location                = module.rgroup.rgroup_name.location
-  lb_name                 = "my-loadbalancer"
+  lb_name                 = "n01009389-loadbalancer"
   frontend_ip_configuration_name = "frontend-ipconfig"
   backend_pool_name       = "backend-pool"
-  probe_name              = "health-probe"
+  probe_name              = "lbprobe"
   inbound_nat_rule_name   = "inbound-nat-rule"
-  vm_names                = ["vm1", "vm2", "vm3"]
-  network_interface_id    = [
-    "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Network/networkInterfaces/n01009389-u-vm1-nic",
-    "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Network/networkInterfaces/n01009389-u-vm2-nic",
-    "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Network/networkInterfaces/n01009389-u-vm3-nic"
-  ]
-  subnet_id              = "/subscriptions/8339a174-3737-42f0-aaa4-d1c412a37002/resourceGroups/n01009389-RG/providers/Microsoft.Network/virtualNetworks/n01009389-VNET/subnets/n01009389-SUBNET"
+  network_interface_id    = module.vmlinux.network_interface_ids
+  dns_label               = "n01009389-label"
 }
-*/
+
 
 module "database" {
   source = "./modules/database-n01009389"

@@ -8,7 +8,7 @@ output "recovery_services_vault_name" {
   value       = azurerm_recovery_services_vault.recovery_services_vault.name
 }
 
-output "storage_account_name" {
+output "storage_account" {
   description = "Name of the provisioned Storage Account."
-  value       = azurerm_storage_account.storage_account.name
+  value       = azurerm_storage_account.storage_account
 }

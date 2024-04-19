@@ -3,6 +3,7 @@ resource "azurerm_public_ip" "lb_public_ip" {
   resource_group_name = var.resource_group_name
   location            = var.location
   allocation_method   = "Static"
+  domain_name_label   = var.dns_label
 }
 
 resource "azurerm_lb" "main" {
@@ -28,6 +29,7 @@ resource "azurerm_lb_backend_address_pool" "backend_pool" {
   loadbalancer_id     = azurerm_lb.main.id
 }
 
+/*
 resource "azurerm_network_interface" "linux_nic" {
   for_each            = toset(var.vm_names)
   name                = "nic-${each.value}"
@@ -40,10 +42,28 @@ resource "azurerm_network_interface" "linux_nic" {
     private_ip_address_allocation = "Dynamic"
   }
 }
+*/
 
 resource "azurerm_network_interface_backend_address_pool_association" "vm_association" {
-  for_each                  = toset(var.vm_names)
-  network_interface_id      = azurerm_network_interface.linux_nic[each.key].id
-  ip_configuration_name     = azurerm_network_interface.linux_nic[each.key].ip_configuration[0].name
+  for_each                  = var.network_interface_id
+  network_interface_id      = each.value
+  ip_configuration_name     = "${each.key}-ipconfig"
   backend_address_pool_id   = azurerm_lb_backend_address_pool.backend_pool.id
+}
+
+resource "azurerm_lb_probe" "lb_probe" {
+  loadbalancer_id = azurerm_lb.main.id
+  name            = var.probe_name
+  port            = 80
+}
+
+resource "azurerm_lb_rule" "lb_rule" {
+  loadbalancer_id                = azurerm_lb.main.id
+  name                           = "lbrule-n01009389"
+  protocol                       = "Tcp"
+  frontend_port                  = 80
+  backend_port                   = 80
+  frontend_ip_configuration_name = azurerm_lb.main.frontend_ip_configuration[0].name
+  backend_address_pool_ids       = [azurerm_lb_backend_address_pool.backend_pool.id]
+  probe_id                       = azurerm_lb_probe.lb_probe.id
 }
